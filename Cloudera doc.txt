@@ -1,0 +1,30 @@
+1) set up for networking --->basically for communication
+2) for creating three server cluster -> /etc/ntp.conf 
+3)ntpd on -> @boot time to start the processes, not to start manually
+4) any daemon process startus from ntpd to start
+chckconfig for start to automatically...
+5)hwclock ->syncronisation of clock
+6)make sure all the three servers has unique name
+7)each server file all the three nodes ka FQDN of the hostnames ->so that they talk each other
+8) sys-> network -> to change the hostnames of any server-> we use the same name
+9) uname -a -> to find out which version of linux in machine
+10)/sbin/ifconfig ->o/p as ip afddr and hostname
+11)getent hosts vm-macra2 -> to check the hostname
+12) disabling selinux
+13)disabling firewalld-> firewalld service disable 
+
+whichever comments runs by 1)service
+			   2)systemctl
+
+
+14)download and install by yum
+yum ->to download and install repositories cdh5
+
+15)yum install hadoop-yarn-manager->find the package and run the required repository
+
+can run any parameters and it installs these packages
+16) assigning the priority to the configuration files for the hadoop cluster 
+
+if conf is not there then it will refer to the alternative
+17)
+ 

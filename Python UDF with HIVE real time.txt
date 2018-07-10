@@ -1,0 +1,35 @@
+================================================================= Python on HDInsight ==============================================================================
+
+Go to cloud shell in Azure portal.
+Enter ssh sshuser@HdisightClust-ssh.azurehdinsight.net(ssh from your cluster)
+
+=========================================================== Creating Table from Datalakestore ======================================================================
+
+**Enter HIVE 
+CREATE TABLE bookstore(t1 string, t2 string,t3 string)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+LOCATION 'adl://datalakestore0711.azuredatalakestore.net/clusters/HdisightClust/DataLakeStore/BookStore/';
+
+====================================================================== Python UDF ==================================================================================
+
+**Switch to hdinsight cluster
+import sys
+import datetime
+for line in sys.stdin:
+	line = line.strip()
+	ID , BName , Quantity = line.split('\t')
+	B_name = BName.upper() 
+	print '\t'.join([ID, str(B_name), Quantity])
+
+============================================================= Code To Perform Analytics- Hive with PIG ==============================================================
+
+**Enter HIVE
+add file books.py;
+INSERT OVERWRITE DIRECTORY 'adl://datalakestore0711.azuredatalakestore.net/clusters/HdisightClust/hive/warehouse/Output'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+SELECT TRANSFORM (t1,t2,t3)
+USING 'python books.py' AS
+(ID, B_name, Quantity)
+FROM bookstore;
+
+======================================================================================================================================================================

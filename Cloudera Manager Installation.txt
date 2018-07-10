@@ -1,0 +1,10 @@
+=======================================STEPS TO INSTALL CLOUDERA SERVER MANAGER=========================================
+sudo wget http://archive.cloudera.com/cm5/installer/5.10.0/cloudera-manager-installer.bin
+
+chmod u+x cloudera-manager-installer.bin
+
+sudo ./cloudera-manager-installer.bin
+
+=======================================To uninstall CLOUDERA SERVER MANAGER=============================================
+ sudo /usr/share/cmf/uninstall-cloudera-manager.sh
+========================================================================================================================

@@ -1,0 +1,35 @@
+--------------------------------------------------Installing Sqoop-------------------------------------------------
+
+sudo yum install sqoop   'installs sqoop
+
+sqoop help
+sqoop version
+sqoop import 
+
+
+mkdir -p /var/lib/sqoop
+sudo chown sqoop:sqoop /var/lib/sqoop
+sudo chmod 755 /var/lib/sqoop
+
+mysql -u root -p
+
+create a table
+insert records to the table
+
+jdbc driver is essential .hence download jdbc driver and place it in /home/nit-lego
+
+then copy to /var/lib/sqoop
+sudo cp mysql-coonector-java-5.1.42-bin.jar /var/lib/sqoop
+bhk
+
+
+since we had java.jdk exception hence we downloaded oracle jdk and placed in /home/nit-lego
+
+it was rpm, a package.Hence,followed following steps:
+sudo rpm -ivh /home/nit-lego/jdk-8u1-linux-x64.rpm
+
+
+export JAVA_HOME=/usr/jave/jdk...
+
+
+sqoop import --connect jdbc:mysql://localhost/EHR --username hive --password nitor@123 --table TestSqoop -m 1 -- target -dir /user/nit-lego; ' imports data to sqooop - incase for loading further use -- append at the end

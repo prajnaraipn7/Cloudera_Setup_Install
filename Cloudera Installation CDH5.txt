@@ -1,0 +1,103 @@
+====================================================================Enabling NTP==============================================================================
+---sudo yum install ntp   
+---sudo vi /etc/ntp.conf  and add 
+server 0.pool.ntp.org
+server 1.pool.ntp.org
+server 2.pool.ntp.org
+---sudo chkconfig ntpd on
+---sudo service ntpd start
+---sudo ntpdate -u <your_ntp_server>
+---sudo hwclock --systohc
+==================================================================Configuring Network Names===================================================================
+Since, Already we have a unique name as in nit-macra2, need not change the hostname
+---sudo vi /etc/hosts
+Enter ****10.11.13.147  VM-MACRA2.nitorinfotech.in VM-MACRA2****
+---sudo vi /etc/sysconfig/network
+Enter ****NETWORKING=<TRUE> HOSTNAME=<VM-MACRA2.nitorinfotech.in>****
+uname -a 
+Run /sbin/ifconfig and note the value of inet addr in the eth0 entry
+getent hosts vm-macra2 
+------"this command is used instead of host -v -t A `hostname`(as it doesnot work in our s/m)"----------
+
+====================================================================Disabling SELinux=========================================================================
+getenforce
+---sudo vi /etc/selinux/config
+Change the line SELINUX=enforcing to SELINUX=permissive
+setenforce 0
+====================================================================Disabling firewall========================================================================
+systemctl stop firewalld
+systemctl disable firewalld
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+====================================================================Before deploying HDFS=====================================================================
+----->Install the latest CDH5
+---sudo /etc/yum.repos.d
+---sudo vi
+----------------------------------------------Copy -----------------------------------------------------------------------------------------------------------
+[cloudera-cdh5]
+# Packages for Cloudera's Distribution for Hadoop, Version 5, on RedHat	or CentOS 7 x86_64
+name=Cloudera's Distribution for Hadoop, Version 5
+baseurl=https://archive.cloudera.com/cdh5/redhat/7/x86_64/cdh/5/
+gpgkey =https://archive.cloudera.com/cdh5/redhat/7/x86_64/cdh/RPM-GPG-KEY-cloudera    
+gpgcheck = 1
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------For all the required components--------------------------------------------------
+---sudo yum clean all; sudo yum install hadoop-yarn-nodemanager hadoop-hdfs-datanode hadoop-mapreduce hadoop-hdfs-namenode hadoop-yarn-resourcemanager
+----------------------------------------------------------------------------------------------------------
+======================================================================Deploying HDFS==========================================================================
+---sudo cp -r /etc/hadoop/conf.empty /etc/hadoop/conf.my_cluster
+---sudo alternatives --install /etc/hadoop/conf hadoop-conf /etc/hadoop/conf.my_cluster 50
+---sudo alternatives --set hadoop-conf /etc/hadoop/conf.my_cluster
+scp -r root@10.11.13.97:/etc/hadoop/conf  /etc/hadoop/conf.my_cluster 'copying properties from master node'
+ sudo cp -r /etc/hadoop/conf /etc/hadoop/conf.my_cluster  ' in case of the same node (no master node)'
+ ------------------------------------------Customizing Config File & Config Local Directories----------------------------------------
+**************
+core-site.xml:
+**************
+<configuration>
+<property>
+<name>fs.defaultFS</name>
+<value>hdfs://VM-ARCT.nitorinfotech.in:8020</value>
+</property>
+</configuration>
+**************
+hdfs-site.xml:          
+**************
+<configuration>
+<property>
+<name>dfs.namenode.name.dir</name>
+<value>file:///var/lib/hadoop-hdfs/cache/hdfs/dfs/name</value>
+</property>
+<property>
+name>dfs.datanode.data.dir</name>
+<value>file:///var/lib/hadoop-hdfs/cache/hdfs/dfs/data</value>
+</property>
+<property>
+<name>dfs.permissions.superusergroup</name>
+<value>hadoop</value>
+</property>
+<property>
+<name>dfs.client.file-block-storage-locations.timeout.millis</name>
+<value>10000</value>
+</property>
+<property>
+<name>dfs.datanode.hdfs-blocks-metadata.enabled</name>
+<value>true</value>
+</property>
+</configuration>
+
+---sudo mkdir -p /var/lib/hadoop-hdfs/cache/hdfs/dfs/name
+---sudo mkdir -p /var/lib/hadoop-hdfs/cache/hdfs/dfs/data
+---sudo chown -R hdfs:hdfs /var/lib/hadoop-hdfs/cache/hdfs/dfs/name ' Name Node
+---sudo chown -R hdfs:hdfs /var/lib/hadoop-hdfs/cache/hdfs/dfs/data ' Data Node
+---------------------------------------------Start HDFS--------------------------------------------------------------
+---sudo alternatives --verbose --install /etc/hadoop/conf hadoop-conf /etc/hadoop/conf.my_cluster 50
+---sudo alternatives --set hadoop-conf /etc/hadoop/conf.my_cluster
+
+formating name node is essential -> which is done by sudo -u hdfs hdfs namenode -format
+
+for x in `cd /etc/init.d ; ls hadoop-hdfs-*` ; do sudo service $x start ; done --'Start HDFS'
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------
+sudo service hadoop-hdfs-datanode start  ' HDFS service start for datanode
+sudo service hadoop-hdfs-datanode stop   ' Service stop
+sudo service hadoop-hdfs-datanode restart 'service restart
